@@ -1,6 +1,7 @@
 package com.horizen.hc_user_service.service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,33 +45,64 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<UserResponse> getAllUsers() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getAllUsers'");
+        return userRepository.findAll().stream()
+                .map(this::mapToUserResponse)
+                .collect(Collectors.toList());
     }
 
     @Override
+    @Transactional(readOnly = true)
     public UserResponse getUserById(Long id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getUserById'");
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+        return mapToUserResponse(user);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public UserResponse getUserByNickname(String nickname) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getUserByNickname'");
+        User user = userRepository.findByNickname(nickname)
+                .orElseThrow(() -> new RuntimeException("User not found with nickname: " + nickname));
+        return mapToUserResponse(user);
     }
 
     @Override
     public UserResponse updateUser(Long id, UserRequest userRequest) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'updateUser'");
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+
+        // Check if new nickname is taken by another user
+        if (!user.getUsername().equals(userRequest.getUserName()) &&
+                userRepository.existsByNickname(userRequest.getUserName())) {
+            throw new RuntimeException("Nickname already exists: " + userRequest.getUserName());
+        }
+
+        // Check if new email is taken by another user
+        if (!user.getEmail().equals(userRequest.getEmail()) &&
+                userRepository.existsByEmail(userRequest.getEmail())) {
+            throw new RuntimeException("Email already exists: " + userRequest.getEmail());
+        }
+
+        user.setUsername(userRequest.getUserName());
+        user.setFirstName(userRequest.getFirstName());
+        user.setLastName(userRequest.getLastName());
+        user.setEmail(userRequest.getEmail());
+        if (userRequest.getSkills() != null) {
+            user.setSkills(userRequest.getSkills());
+        }
+
+        User updatedUser = userRepository.save(user);
+        return mapToUserResponse(updatedUser);
     }
 
     @Override
     public void deleteUser(Long id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deleteUser'");
+        if (!userRepository.existsById(id)) {
+            throw new RuntimeException("User not found with id: " + id);
+        }
+        userRepository.deleteById(id);
     }
 
     private UserResponse mapToUserResponse(User user) {
