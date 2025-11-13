@@ -1,21 +1,34 @@
 package com.horizen.hc_user_service.service;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
-import com.horizen.hc_user_service.dto.UserRequest;
-import com.horizen.hc_user_service.dto.UserResponse;
+import com.horizen.hc_user_service.dto.CreateUserRequest;
+import com.horizen.hc_user_service.dto.UpdateUserRequest;
+import com.horizen.hc_user_service.dto.UserDto;
+
+import java.util.List;
+import java.util.UUID;
 
 public interface UserService {
 
-    UserResponse createUser(UserRequest userRequest);
+    UserDto createUser(CreateUserRequest request);
 
-    List<UserResponse> getAllUsers();
+    List<UserDto> getAllUsers();
 
-    UserResponse getUserById(Long id);
+    Page<UserDto> getAllUsers(Pageable pageable);
 
-    UserResponse getUserByUsername(String username);
+    UserDto getUserById(UUID id);
 
-    UserResponse updateUser(Long id, UserRequest userRequest);
+    UserDto getUserByUsername(String username);
 
-    void deleteUser(Long id);
+    UserDto getUserByEmail(String email);
+
+    UserDto getUserByUsernameOrEmail(String username, String email);
+
+    UserDto updateUser(UUID id, UpdateUserRequest request);
+
+    UserDto partialUpdateUser(UUID id, UpdateUserRequest request);
+
+    void deleteUser(UUID id);
 }
