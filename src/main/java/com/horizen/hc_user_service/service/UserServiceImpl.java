@@ -62,9 +62,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public UserResponse getUserByNickname(String nickname) {
-        User user = userRepository.findByNickname(nickname)
-                .orElseThrow(() -> new RuntimeException("User not found with nickname: " + nickname));
+    public UserResponse getUserByUsername(String username) {
+        User user = userRepository.findByNickname(username)
+                .orElseThrow(() -> new RuntimeException("User not found with nickname: " + username));
         return mapToUserResponse(user);
     }
 

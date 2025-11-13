@@ -13,7 +13,7 @@ public interface UserService {
 
     UserResponse getUserById(Long id);
 
-    UserResponse getUserByNickname(String nickname);
+    UserResponse getUserByUsername(String username);
 
     UserResponse updateUser(Long id, UserRequest userRequest);
 
